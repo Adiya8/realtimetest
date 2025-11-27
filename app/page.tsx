@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,14 +9,27 @@ export default function TaskBoard() {
   const [tasks, setTasks] = useState<string[]>([]);
   const [input, setInput] = useState("");
 
-  const addTask = () => {
-    if (!input.trim()) return;
-    setTasks([...tasks, input.trim()]);
-    setInput("");
-  };
-  console.log(tasks);
-
   const removeAll = () => setTasks([]);
+
+  async function addTask() {
+    if (!input.trim()) return;
+
+    const response = await fetch("/api/be", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task: input }),
+    });
+
+    const data = await response.json();
+
+    if (Array.isArray(data?.data)) {
+      setTasks(data.data);
+    } else {
+      setTasks((prev) => [...prev, input]);
+    }
+
+    setInput("");
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen p-4 font-inter">

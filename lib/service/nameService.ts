@@ -1,21 +1,21 @@
-import { Name, NameSchemaType } from "../models/names";
+import { Task, TaskSchemaType } from "../models/names";
 import { connectDB } from "../mongodb";
 
-export const getAllName = async (): Promise<NameSchemaType[]> => {
+export const getAllTask = async (): Promise<TaskSchemaType[]> => {
   await connectDB();
-  const allName: NameSchemaType[] = await Name.find();
-  return allName;
+  const allTask: TaskSchemaType[] = await Task.find();
+  return allTask;
 };
 
-export const createName = async (name: string) => {
+export const createTask = async (task: string) => {
   try {
     await connectDB();
-    const newName = new Name({
-      name,
+    const newTask = new Task({
+      task,
     });
-    await newName.save();
+    await newTask.save();
 
-    return newName;
+    return newTask;
   } catch (error) {
     console.log("END ALDAA GARLAA", error);
   }

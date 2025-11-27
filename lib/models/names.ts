@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
-export type NameSchemaType = {
-  name: string;
+export type TaskSchemaType = {
+  task: string;
 };
-const nameSchema = new Schema({
-  name: { type: String, required: true },
+const taskSchema = new Schema({
+  task: String,
 });
 
-export const Name =
-  mongoose.models.Name || mongoose.model<NameSchemaType>("Name", nameSchema);
+export const Task =
+  mongoose.models.Task || mongoose.model<TaskSchemaType>("Task", taskSchema);
