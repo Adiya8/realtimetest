@@ -3,8 +3,8 @@ import Objects from "ably/objects";
 import { nanoid } from "nanoid";
 
 import "./styles.css";
-import { config } from "@/app/config";
-import { Tasks } from "@/app/ablyConfig";
+import { config } from "@/lib/config";
+import { Tasks } from "@/lib/ablyConfig";
 
 const client = new Realtime({
   clientId: nanoid(),
