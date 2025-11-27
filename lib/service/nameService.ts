@@ -1,15 +1,15 @@
 import { Task, TaskSchemaType } from "../models/names";
-import { connectDB } from "../mongodb";
+import { getMongo } from "../mongodb";
 
 export const getAllTask = async (): Promise<TaskSchemaType[]> => {
-  await connectDB();
+  await getMongo();
   const allTask: TaskSchemaType[] = await Task.find();
   return allTask;
 };
 
 export const createTask = async (task: string) => {
   try {
-    await connectDB();
+    await getMongo();
     const newTask = new Task({
       task,
     });

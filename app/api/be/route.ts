@@ -1,23 +1,48 @@
-import { createTask, getAllTask } from "@/lib/service/nameService";
 import { NextRequest, NextResponse } from "next/server";
+const { db } = await getMongo();
+const col = db.collection("tasks");
+
+import { getMongo } from "@/lib/mongodb";
 
 export async function GET() {
-  const result = await getAllTask();
-  return NextResponse.json({ data: result }, { status: 200 });
+  try {
+    const { db } = await getMongo();
+    const col = db.collection("tasks");
+
+    const docs = await col
+      .find({}, { projection: { _id: 0, task: 1 } })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return NextResponse.json({ data: docs.map((d) => d.task) });
+  } catch (err) {
+    console.error("GET error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await req.json();
+    const task = body?.task;
 
-    const { task } = body;
-    console.log("Received session name:", task);
+    if (!task || typeof task !== "string") {
+      return NextResponse.json({ error: "Invalid task" }, { status: 400 });
+    }
 
-    const result = await createTask(task);
+    const { db } = await getMongo();
+    const col = db.collection("tasks");
 
-    return NextResponse.json({ data: result }, { status: 201 });
-  } catch (error) {
-    console.error("Error in POST /api/be:", error);
-    return NextResponse.json({ message: "aldaa garlaa" }), { status: 500 };
+    await col.insertOne({ task, createdAt: new Date() });
+
+    const docs = await col
+      .find({}, { projection: { _id: 0, task: 1 } })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    return NextResponse.json({ data: docs.map((d) => d.task) });
+  } catch (err) {
+    console.error("POST error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

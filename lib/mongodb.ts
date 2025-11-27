@@ -1,24 +1,32 @@
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
+const uri = process.env.MONGO_URI;
 
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
+if (!uri) {
+  throw new Error("❌ Missing MONGO_URI in .env.local");
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
 
-export async function connectDB() {
-  if (cached.conn) return cached.conn;
+// Global variable to prevent creating many clients in dev mode
+const globalWithMongo = global as unknown as {
+  _mongoClientPromise?: Promise<MongoClient>;
+};
 
-  if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(MONGODB_URI, {})
-      .then((mongoose) => mongoose);
+if (process.env.NODE_ENV === "development") {
+  if (!globalWithMongo._mongoClientPromise) {
+    client = new MongoClient(uri);
+    globalWithMongo._mongoClientPromise = client.connect();
   }
+  clientPromise = globalWithMongo._mongoClientPromise;
+} else {
+  client = new MongoClient(uri);
+  clientPromise = client.connect();
+}
 
-  cached.conn = await cached.promise;
-  return cached.conn;
+export async function getMongo() {
+  const client = await clientPromise;
+  const db = client.db(process.env.MONGO_DB || "test"); // <- choose your DB
+  return { client, db };
 }
