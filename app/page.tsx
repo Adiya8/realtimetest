@@ -37,7 +37,6 @@ export default function TaskBoard() {
         <h2 className="text-sm font-bold text-center mb-4">
           Realtime Task Board
         </h2>
-
         <div className="flex space-x-2">
           <Input
             value={input}
@@ -56,7 +55,6 @@ export default function TaskBoard() {
             Remove all
           </Button>
         </div>
-
         <Card className="h-[400px] overflow-y-auto shadow-lg">
           <CardContent className="p-4 space-y-4">
             {tasks.map((t, i) => (
@@ -69,6 +67,7 @@ export default function TaskBoard() {
             ))}
           </CardContent>
         </Card>
+        fbb
       </div>
     </div>
   );
